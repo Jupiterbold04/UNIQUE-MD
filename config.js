@@ -1,160 +1,144 @@
-import { watchFile, unwatchFile } from "fs"
-import chalk from "chalk"
-import { fileURLToPath } from "url"
-import fs from "fs"
-import cheerio from "cheerio"
-import fetch from "node-fetch"
-import axios from "axios"
-import moment from "moment-timezone"
+const fs = require('fs-extra')
+if (fs.existsSync('.env')) require('dotenv').config({ path: __dirname+'/.env' })
+
+
+//═══════[Required Variables]════════\\
+global.audio= "" ;  
+global.video= "" ;
+global.port =process.env.PORT
+global.appUrl=process.env.APP_URL || ""                       // put your app url here,
+global.email ="saimsamsun789@gmail.co"
+global.location="Lagos,Nigeria."
+
+
+global.mongodb= process.env.MONGODB_URI || ""
+global.allowJids= process.env.ALLOW_JID || "null" 
+global.blockJids= process.env.BLOCK_JID || "null"
+global.DATABASE_URL = process.env.DATABASE_URL || ""
+
+global.timezone= process.env.TZ || process.env.TIME_ZONE || "Africa/Lagos";
+global.github=process.env.GITHUB|| "https://github.com/SuhailTechInfo/Suhail-Md";
+global.gurl  =process.env.GURL  || "https://whatsapp.com/channel/0029Va9thusJP20yWxQ6N643";
+global.website=process.env.GURL || "https://whatsapp.com/channel/0029Va9thusJP20yWxQ6N643" ; 
+global.THUMB_IMAGE = process.env.THUMB_IMAGE || process.env.IMAGE || "https://telegra.ph/file/6ed51d9ca3914432e9df4.jpg" ; // SET LOGO FOR IMAGE 
+global.caption = process.env.CAPTION || global.caption || "Ͳհҽ օղҽ ąҍօѵҽ ąӀӀ 👑🌎☠" 
+
+
+global.devs = "923184474176" // Developer Contact
+global.sudo = process.env.SUDO ? process.env.SUDO.replace(/[\s+]/g, '') : "null";
+global.owner= process.env.OWNER_NUMBER ? process.env.OWNER_NUMBER.replace(/[\s+]/g, '') : "2349071978357";
 
 
 
 
+//========================= [ BOT SETTINGS ] ======8===================\\
+global.style = process.env.STYLE   || Math.floor(Math.random()*6) || '0'  // put '1' to "5" here to check bot styles
+global.flush = process.env.FLUSH   || "false"; // Make it "true" if bot not responed
+global.gdbye = process.env.GOODBYE || process.env.CAN_GOODBYE || "false"; 
+global.wlcm  = process.env.WELCOME || process.env.CAN_WELCOME || "false";  // Make it "false" for disable WELCOME 
 
-global.owner = [
-  ["2349071978357", "Prince", false],
-  [''], 
-  [''] 
-]
-//💌------------------------------------------💌
+global.warncount = process.env.WARN_COUNT || 3
+global.disablepm = process.env.DISABLE_PM || "false"
+global.disablegroup = process.env.DISABLE_GROUPS || "false", // disable bot in groups when public mode
 
-
-//💌global.pairingNumber = "" //put your bot number here💌
-global.mods = ['923042205427'] 
-global.prems = ['']
-global.allowed = ['']
-global.keysZens = ['c2459db922', '37CC845916', '6fb0eff124']
-global.keysxxx = keysZens[Math.floor(keysZens.length * Math.random())]
-global.keysxteammm = ['29d4b59a4aa687ca', '5LTV57azwaid7dXfz5fzJu', 'cb15ed422c71a2fb', '5bd33b276d41d6b4', 'HIRO', 'kurrxd09', 'ebb6251cc00f9c63']
-global.keysxteam = keysxteammm[Math.floor(keysxteammm.length * Math.random())]
-global.keysneoxrrr = ['5VC9rvNx', 'cfALv5']
-global.keysneoxr = keysneoxrrr[Math.floor(keysneoxrrr.length * Math.random())]
-global.lolkeysapi = ['GataDios']
-//💌------------------------------------------💌
+global.MsgsInLog = process.env.MSGS_IN_LOG|| "false" // "true"  to see messages , "log" to show logs , "false" to hide logs messages
+global.userImages= process.env.USER_IMAGES || "https://telegra.ph/file/6ed51d9ca3914432e9df4.jpg" // "text" // set Image/video urls here
+global.waPresence= process.env.WAPRESENCE ||  "null" ; // 'unavailable' | 'available' | 'composing' | 'recording' | 'paused'
 
 
-
-// APIS
-global.APIs = { // API Prefix
-  // name: 'https://website'
-  CFROSAPI: 'https://api.cafirexos.com',
-  xteam: 'https://api.xteam.xyz', 
-  nrtm: 'https://fg-nrtm.ddns.net',
-  bg: 'http://bochil.ddns.net',
-  fgmods: 'https://api.fgmods.xyz'
-}
-// 💌------------------------------------------💌
+//========================= [ AUTO READ MSGS & CMDS ] =========================\\
+global.readcmds = process.env.READ_COMMAND || "false"
+global.readmessage = process.env.READ_MESSAGE || "false"
+global.readmessagefrom = process.env.READ_MESSAGE_FROM || "null,923xxxxxxxx";
 
 
+//========================= [ AUTO SAVE & READ STATUS ] =========================\\
+global.read_status = process.env.AUTO_READ_STATUS || "false"
+global.save_status = process.env.AUTO_SAVE_STATUS || "false"
+global.save_status_from =  process.env.SAVE_STATUS_FROM  || "null,923xxxxxxxx";
+global.read_status_from =  process.env.READ_STATUS_FROM  ||  "923184474176,923xxxxxxxx";
+
+global.api_smd = "https://api-smd.onrender.com" //  || "https://api-smd-1.vercel.app" // expires
+global.scan = "https://suhail-md-vtsf.onrender.com";
 
 
-//APIKEYS
-global.APIKeys = { // APIKey Here
-  // 'https://website': 'apikey'
-  'https://api.xteam.xyz': 'd90a9e986e18778b',
-  'https://zenzapis.xyz': '675e34de8a', 
-  'https://api.fgmods.xyz': 'dEBWvxCY'
-}
-//💌------------------------------------------💌
+global.SESSION_ID = process.env.SESSION_ID ||  "eyJub2lzZUtleSI6eyJwcml2YXRlIjp7InR5cGUiOiJCdWZmZXIiLCJkYXRhIjoid0UzVFlmbEs0dkRqa2p2Z2ttRXp3amVHODh1MVFxWFppMlRwUDcvcTUzST0ifSwicHVibGljIjp7InR5cGUiOiJCdWZmZXIiLCJkYXRhIjoiM25Ma216YmdOWmxJbjJUNHdmQmVhZDBOTlBxQjM1cHg2MGZUZGtCMStIND0ifX0sInBhaXJpbmdFcGhlbWVyYWxLZXlQYWlyIjp7InByaXZhdGUiOnsidHlwZSI6IkJ1ZmZlciIsImRhdGEiOiJnUEdzSEpzbDh2Z1pFRkIxYzdXakpONmNVV28wSktYUkpUbHJFVlc3ZmxRPSJ9LCJwdWJsaWMiOnsidHlwZSI6IkJ1ZmZlciIsImRhdGEiOiJ0bkowckE5YWdOTDFhVXpGdW52ZmNXN2lIRlRGNHN5S2cxN1F5aGpWajEwPSJ9fSwic2lnbmVkSWRlbnRpdHlLZXkiOnsicHJpdmF0ZSI6eyJ0eXBlIjoiQnVmZmVyIiwiZGF0YSI6IjJQOWtZZVNvdlBCcWdBL2ZYRWRKU0xqbWQyd0E0UDEzK21PS3Nrdi84V2M9In0sInB1YmxpYyI6eyJ0eXBlIjoiQnVmZmVyIiwiZGF0YSI6IlVLZnFOZFphbzExaWk5NG9xSGl3dkM4SDVuMjR6ajhsTGYwSGRNVXBxZ1E9In19LCJzaWduZWRQcmVLZXkiOnsia2V5UGFpciI6eyJwcml2YXRlIjp7InR5cGUiOiJCdWZmZXIiLCJkYXRhIjoibUFGSXhIMUt3d2JXS3hPK29Kd3hqdkN1bCtjSkthK2FiSWwrZTUvOUVtST0ifSwicHVibGljIjp7InR5cGUiOiJCdWZmZXIiLCJkYXRhIjoiRVVPaFEzendjOE13QkxNbzJtODd4L1NNZWRVK2ZJQk1LWFNsWGZnSWRFZz0ifX0sInNpZ25hdHVyZSI6eyJ0eXBlIjoiQnVmZmVyIiwiZGF0YSI6IlBJWElmMjdNdEY2NjQ5eHI1T054a3k4S20xN2tnQkd2ZDFVNlROTDNuTGVBVjREU3V2T0xKcHl6QkNMcVFvZGVoMHZKSFFYSG9yeWJsVXlxcEp2V2lBPT0ifSwia2V5SWQiOjF9LCJyZWdpc3RyYXRpb25JZCI6MTk5LCJhZHZTZWNyZXRLZXkiOiI5b0dGbGRXbS9aNDF3NlBmc0hLUzVuNElZWkZqdXBBTTF6TkovQ1YrTmpJPSIsInByb2Nlc3NlZEhpc3RvcnlNZXNzYWdlcyI6W10sIm5leHRQcmVLZXlJZCI6MzEsImZpcnN0VW51cGxvYWRlZFByZUtleUlkIjozMSwiYWNjb3VudFN5bmNDb3VudGVyIjowLCJhY2NvdW50U2V0dGluZ3MiOnsidW5hcmNoaXZlQ2hhdHMiOmZhbHNlfSwiZGV2aWNlSWQiOiJwSzRGem1nTFItdUlicnZxSjhrVjZ3IiwicGhvbmVJZCI6ImI2ZTcyMDQ5LTQ3ZjktNGNiZi05YjA1LTkwMWM2Mzc2ODU0ZSIsImlkZW50aXR5SWQiOnsidHlwZSI6IkJ1ZmZlciIsImRhdGEiOiJ1ZGZOc29YcENtdERqZ3ZISTYzbWZQZXYra1U9In0sInJlZ2lzdGVyZWQiOnRydWUsImJhY2t1cFRva2VuIjp7InR5cGUiOiJCdWZmZXIiLCJkYXRhIjoiZ2kwL0t4b2lRWnE1MHZ4SVc2dlBvQmk3cndnPSJ9LCJyZWdpc3RyYXRpb24iOnt9LCJwYWlyaW5nQ29kZSI6IjNHRUdGTTRFIiwibWUiOnsiaWQiOiIyMzQ5MDcxOTc4MzU3OjIwQHMud2hhdHNhcHAubmV0In0sImFjY291bnQiOnsiZGV0YWlscyI6IkNMZUkzL1lERUxIV3E3WUdHQW9nQUNnQSIsImFjY291bnRTaWduYXR1cmVLZXkiOiI4Qmx6d3dGY1V2MWdPNWV2Q0Z4bzZZMU50SVkyTVk0VWV2OE9NeTl3aFdjPSIsImFjY291bnRTaWduYXR1cmUiOiJVTndGQmVjdi9LajlGa09FKzJsZVFLK2w5SytjN1JoUFJaNkx0c1NtMkhxVlBwQXF5R0ZEelNMd0YwQ28rZkI3SWJ0S3ZWclVHaXFNTFNLQlNhMkZDdz09IiwiZGV2aWNlU2lnbmF0dXJlIjoiVVJXSkt4RThPNExPOTl6L3MwTkRYaGxjNEJTQjJBbnlPekxRYXB5QXRrVVp4VXNQb3FZUGcwWmYyclN1UU9XMjBNb0NUb2lMS3R2ZmFJOHFVbk90aVE9PSJ9LCJzaWduYWxJZGVudGl0aWVzIjpbeyJpZGVudGlmaWVyIjp7Im5hbWUiOiIyMzQ5MDcxOTc4MzU3OjIwQHMud2hhdHNhcHAubmV0IiwiZGV2aWNlSWQiOjB9LCJpZGVudGlmaWVyS2V5Ijp7InR5cGUiOiJCdWZmZXIiLCJkYXRhIjoiQmZBWmM4TUJYRkw5WUR1WHJ3aGNhT21OVGJTR05qR09GSHIvRGpNdmNJVm4ifX1dLCJwbGF0Zm9ybSI6ImFuZHJvaWQiLCJsYXN0QWNjb3VudFN5bmNUaW1lc3RhbXAiOjE3MjQ1NzQ1MTYsIm15QXBwU3RhdGVLZXlJZCI6IkFBQUFBSjNWIn0="
 
 
+module.exports = {
 
-// Bot Images 
-global.imagen1 = fs.readFileSync("./Assets/menus/Menu.png")
-global.imagen2 = fs.readFileSync("./Assets/menus/Menu1.jpg")
-global.imagen3 = fs.readFileSync("./Assets/menus/Menu2.jpg")
-global.imagen4 = fs.readFileSync("./Assets/menus/Menu3.jpg")
-global.imagen5 = fs.readFileSync("./Assets/menus/img2.jpg")
-global.imagen6 = fs.readFileSync("./Assets/menus/img5.jpg")
-global.imagen7 = fs.readFileSync("./Assets/menus/img6.jpg")
-global.imagen8 = fs.readFileSync("./Assets/menus/img8.jpg")
-global.imagen9 = fs.readFileSync("./Assets/menus/img9.jpg")
-global.imagen10 = fs.readFileSync("./Assets/menus/img11.jpg")
-global.imagen11 = fs.readFileSync("./Assets/menus/img12.jpg")
-//💌------------------------------------------💌
+  menu: process.env.MENU || "", /**  Available @MENU @Schemes 1: Aztec_Md, 2: A17_Md, 3: Suhail-Md Default ---------- If Not Choose then it Randomely Pic One Of Them Each time **/
 
+  HANDLERS: process.env.PREFIX  || ".",
+  BRANCH  : process.env.BRANCH  || "main",
+  VERSION : process.env.VERSION || "1.3.8",
+  caption : global.caption || "Ͳհҽ օղҽ ąҍօѵҽ ąӀӀ 👑🌎☠" , // ```『 ᴘᴏᴡᴇʀᴇᴅ ʙʏ sᴜʜᴀɪʟ²²¹-ᴍᴅ 』```", //*『sᴜʙsᴄʀɪʙᴇ • sᴜʜᴀɪʟ ᴛᴇᴄʜ』*\n youtube.com/@suhailtechinfo0"),
+ 
+  author : process.env.PACK_AUTHER|| "ąҍօѵҽ ąӀӀ 👑🌎☠",
+  packname: process.env.PACK_NAME || "ąҍօѵҽ ąӀӀ 👑🌎☠",
+  botname : process.env.BOT_NAME  || "Ͳհҽ օղҽ ąҍօѵҽ ąӀӀ 👑🌎☠",
+  ownername:process.env.OWNER_NAME|| "Ͳհҽ օղҽ ąҍօѵҽ ąӀӀ 👑🌎☠",
 
 
-global.img = 'https://i.imgur.com/IXlUwTW.jpg'
-global.img2 = 'https://i.imgur.com/EXTbyyn.jpg'
-global.img3 = 'https://i.imgur.com/oUAGYc2.jpg' 
-global.img4 = 'https://i.imgur.com/i0pccuo.jpg' 
-global.img5 = 'https://i.imgur.com/iL1snRx.jpeg'
-global.img6 = 'https://i.imgur.com/cYFgSKv.jpeg'
-global.img7 = 'https://i.imgur.com/JqL3h2V.jpeg'
-global.img8 = 'https://i.imgur.com/PCujt1s.jpeg'
-global.img9 = 'https://i.imgur.com/xfUEdDb.jpeg'
-global.img10 = 'https://i.imgur.com/DvHoMc3.jpg'
-global.img11 = 'https://i.imgur.com/5Q1MqGD.jpg'
-global.img12 = 'https://i.imgur.com/vWnsjh8.jpg'
-global.img13 = 'https://i.imgur.com/pCfFOgw.jpeg'
-global.img14 = 'https://i.imgur.com/knBDWRA.jpeg'
-global.img15 = 'https://i.imgur.com/QrkkKx7.jpeg'
-global.img16 = 'https://i.imgur.com/JpYfcH0.jpeg'
-global.img17 = 'https://i.imgur.com/9yLH4W4.jpeg'
-//💌------------------------------------------💌
+  errorChat : process.env.ERROR_CHAT || "",
+  KOYEB_API : process.env.KOYEB_API  || "false",
+
+  REMOVE_BG_KEY : process.env.REMOVE_BG_KEY  || "",
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
+  HEROKU_API_KEY: process.env.HEROKU_API_KEY || "",
+  HEROKU_APP_NAME:process.env.HEROKU_APP_NAME|| "",
+  antilink_values:process.env.ANTILINK_VALUES|| "all",
+  HEROKU: process.env.HEROKU_APP_NAME && process.env.HEROKU_API_KEY,
 
 
-//Chatgpt
-global.gpt1 = fs.readFileSync("./Assets/GPT/gpt1.jpg")
-global.gpt2 = fs.readFileSync("./Assets/GPT/gpt2.png")
-global.gpt3 = fs.readFileSync("./Assets/GPT/gpt3.png")
-global.gpt4 = fs.readFileSync("./Assets/GPT/gpt4.png")
-global.gpt5 = fs.readFileSync("./Assets/GPT/gpt5.png")
-global.gpt6 = fs.readFileSync("./Assets/GPT/gpt6.png")
-//💌------------------------------------------💌
-
-
-// Randome
-global.princeMenu = [img, img2, img6, img7, img8, img9, img13, img14, img15, img16, img17]
-global.princeImg = [imagen1, imagen2, imagen3, imagen4, imagen5, imagen6, imagen7, imagen8, imagen9, imagen10, imagen11]
-global.princegpt = [gpt1, gpt2, gpt3, gpt4, gpt5, gpt6]
-//💌------------------------------------------💌
+  WORKTYPE: process.env.WORKTYPE || process.env.MODE|| "private",
+  LANG: ( process.env.THEME ||  "SUHAIL"  ).toUpperCase(),
 
 
 
-// Moderator 
-global.developer = 'https://wa.me/message/DCAK67ON3XVOG1' //contact
-//💌------------------------------------------💌
+};
 
 
 
-//Sticker WM
-global.botname = '𝘗𝘙𝘐𝘕𝘊𝘌-𝘉𝘖𝘛-𝘔𝘋'
-global.princebot = '🛡️𝘗𝘙𝘐𝘕𝘊𝘌-𝘉𝘖𝘛-𝘔𝘋🛡️'
-global.packname = 'Prince♥️' 
-global.author = 'Prince♥️' 
-global.princeig = 'https://www.instagram.com' 
-global.princegp = 'https://chat.whatsapp.com/GWJkAJSgbv27sGOMLAzMDS'
-global.menuvid = 'https://i.imgur.com/GFAAXqw.mp4'
-global.Princesc = 'https://github.com/PRINCE-GDS/THE-PRINCE-BOT' 
-global.princeyt = 'https://youtube.com/'
-global.Princelog = 'https://i.imgur.com/cUvIv5w.jpeg'
-global.thumb = fs.readFileSync('./Assets/Prince.png')
-//💌------------------------------------------💌
-
-
-
-//Reactions
-global.wait = '*♻️ _𝙶𝙴𝚃𝚃𝙸𝙽𝙶 𝚈𝙾𝚄𝚁 𝙵𝙸𝙻𝙴 𝚆𝙰𝙸𝚃..._*\n*▰▰▰▱▱▱▱▱*'
-global.imgs = '*🖼️ _𝙶𝙴𝚃𝚃𝙸𝙽𝙶 𝚈𝙾𝚄𝚁 ɪᴍᴀɢᴇs 𝚆𝙰𝙸𝚃..._*\n*▰▰▰▱▱▱▱▱*'
-global.rwait = '♻️'
-global.dmoji = '🤭'
-global.done = '✅'
-global.error = '❌' 
-global.xmoji = '🌀' 
-global.multiplier = 69 
-global.maxwarn = '2' 
-//💌------------------------------------------💌
+global.ELEVENLAB_API_KEY = process.env.ELEVENLAB_API_KEY || "";
+global.aitts_Voice_Id = process.env.AITTS_ID|| "37";
 
 
 
 
 
 
-let file = fileURLToPath(import.meta.url)
-watchFile(file, () => {
-  unwatchFile(file)
-  console.log(chalk.redBright("Update 'config.js'"))
-  import(`${file}?update=${Date.now()}`)
-})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+global.rank = "updated"
+global.isMongodb = false; 
+let file = require.resolve(__filename)
+fs.watchFile(file, () => { fs.unwatchFile(file);console.log(`Update'${__filename}'`);delete require.cache[file];	require(file); })
+ 
+
+// ========================= [ Disables in V.1.2.8 ] ===============================\\  
+  //style : process.env.STYLE || "2",  // put '1' & "2" here to check bot styles
+  //readmessage:process.env.READ_MESSAGE|| "false",
+  //warncount: process.env.WARN_COUNT || 3,
+  //userImages:process.env.USER_IMAGES|| "text",  // SET IMAGE AND VIDEO URL FOR BOT MENUS 
+  //disablepm: process.env.DISABLE_PM || "false",
+  //MsgsInLog: process.env.MSGS_IN_LOG|| "false", // "true"  to see messages , "log" to open logs , "false" to hide logs messages
+  //readcmds:process.env.READ_COMMANDS|| "false", 
+  //alwaysonline:process.env.WAPRESENCE|| "unavailable", // 'unavailable' | 'online' | 'composing' | 'recording' | 'paused'
+  //read_status: process.env.AUTO_READ_STATUS || "false",
+  //save_status: process.env.AUTO_SAVE_STATUS || "false",
+  //aitts_Voice_Id : process.env.AITTS_ID || "37",
+  //ELEVENLAB_API_KEY: process.env.ELEVENLAB_API_KEY  || "",
